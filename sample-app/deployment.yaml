@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo-nginx
+  namespace: demo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-nginx
+  template:
+    metadata:
+      labels:
+        app: demo-nginx
+    spec:
+      containers:
+        - name: nginx
+          image: registry.k8s.io/nginx-slim:0.27
+          ports:
+            - containerPort: 8080
+          command:
+            - /bin/sh
+            - -c
+            - |
+              cat <<'EOF' > /usr/share/nginx/html/index.html
+              <html>
+              <head><title>Duncan Networks Demo App</title></head>
+              <body>
+                <h1>Duncan Networks Demo App</h1>
+                <p>OpenShift Ingress + cert-manager test is working.</p>
+              </body>
+              </html>
+              nginx -g 'daemon off;'
