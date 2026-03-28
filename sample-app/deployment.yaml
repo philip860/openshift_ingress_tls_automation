@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: demo-httpd-html
+  name: demo-nginx-html
   namespace: demo-app
 data:
   index.html: |
@@ -18,32 +18,61 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: demo-httpd
+  name: demo-nginx
   namespace: demo-app
+  labels:
+    app: demo-nginx
+    app.kubernetes.io/name: demo-nginx
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: demo-httpd
+      app: demo-nginx
   template:
     metadata:
       labels:
-        app: demo-httpd
+        app: demo-nginx
+        app.kubernetes.io/name: demo-nginx
     spec:
       containers:
-        - name: httpd
-          image: registry.redhat.io/rhel8/httpd-24:latest
-          command:
-            - run-httpd
+        - name: nginx
+          image: nginxinc/nginx-unprivileged:stable-alpine
+          imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8080
+            - name: http
+              containerPort: 8080
               protocol: TCP
           volumeMounts:
             - name: web-content
-              mountPath: /var/www/html/index.html
+              mountPath: /usr/share/nginx/html/index.html
               subPath: index.html
               readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+              scheme: HTTP
+            initialDelaySeconds: 10
+            timeoutSeconds: 1
+            periodSeconds: 20
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
       volumes:
         - name: web-content
           configMap:
-            name: demo-httpd-html
+            name: demo-nginx-html
