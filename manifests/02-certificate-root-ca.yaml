@@ -10,6 +10,8 @@ spec:
     organizations:
       - Duncan-Networks
   secretName: duncan-networks-root-ca-secret
+  privateKey:
+    rotationPolicy: Never
   issuerRef:
     name: duncan-networks-selfsigned-issuer
     kind: ClusterIssuer
