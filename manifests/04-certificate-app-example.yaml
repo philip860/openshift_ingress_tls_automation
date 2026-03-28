@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: demo-app-cert
+  namespace: demo-app
+spec:
+  secretName: demo-app-tls
+  commonName: demo-app.apps.duncan-networks.local
+  dnsNames:
+    - demo-app.apps.duncan-networks.local
+  issuerRef:
+    name: duncan-networks-ca-issuer
+    kind: ClusterIssuer

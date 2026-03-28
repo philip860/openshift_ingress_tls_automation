@@ -1,0 +1,15 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: duncan-networks-root-ca
+  namespace: cert-manager
+spec:
+  isCA: true
+  commonName: Duncan Networks Root CA
+  subject:
+    organizations:
+      - Duncan Networks
+  secretName: duncan-networks-root-ca-secret
+  issuerRef:
+    name: duncan-networks-selfsigned-issuer
+    kind: ClusterIssuer
