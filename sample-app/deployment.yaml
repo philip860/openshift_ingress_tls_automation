@@ -13,21 +13,38 @@ spec:
       labels:
         app: demo-nginx
     spec:
-      containers:
-        - name: nginx
-          image: registry.k8s.io/nginx-slim:0.27
-          ports:
-            - containerPort: 8080
+      volumes:
+        - name: web-content
+          emptyDir: {}
+
+      initContainers:
+        - name: init-web-content
+          image: registry.access.redhat.com/ubi9/ubi-minimal:latest
           command:
             - /bin/sh
             - -c
             - |
-              cat <<'EOF' > /usr/share/nginx/html/index.html
+              cat > /work/index.html <<'EOF'
               <html>
-              <head><title>Duncan Networks Demo App</title></head>
+              <head>
+                <title>Duncan Networks Demo App</title>
+              </head>
               <body>
                 <h1>Duncan Networks Demo App</h1>
                 <p>OpenShift Ingress + cert-manager test is working.</p>
               </body>
               </html>
-              nginx -g 'daemon off;'
+              EOF
+          volumeMounts:
+            - name: web-content
+              mountPath: /work
+
+      containers:
+        - name: nginx
+          image: registry.access.redhat.com/ubi9/nginx-124:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: web-content
+              mountPath: /opt/app-root/src
