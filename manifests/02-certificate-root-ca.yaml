@@ -8,7 +8,7 @@ spec:
   commonName: Duncan Networks Root CA
   subject:
     organizations:
-      - Duncan Networks
+      - Duncan-Networks
   secretName: duncan-networks-root-ca-secret
   issuerRef:
     name: duncan-networks-selfsigned-issuer
